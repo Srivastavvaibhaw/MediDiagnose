@@ -9,8 +9,31 @@ require('dotenv').config();
 const app = express();
 const port = process.env.PORT || 3030;
 
-// Basic CORS setup
-app.use(cors());
+// CORS setup with allowed origins
+const allowedOrigins = [
+  'http://localhost:10000',
+  'https://disease-diagnosis-app.onrender.com',
+  'https://disease-diagnosis-app.vercel.app',
+  'http://44.226.145.213',
+  'http://54.187.200.255',
+  'http://34.213.214.55',
+  'http://35.164.95.156',
+  'http://44.230.95.183',
+  'http://44.229.200.200'
+];
+
+app.use(cors({
+  origin: function(origin, callback) {
+    // Allow requests with no origin (like mobile apps, curl, etc.)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+}));
 
 // Initialize Gemini AI
 const ai = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
