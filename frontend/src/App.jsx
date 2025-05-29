@@ -32,7 +32,7 @@ const ClerkProtectedRoute = ({ children }) => {
         {children}
       </SignedIn>
       <SignedOut>
-        <Navigate to="/login" />
+        <Navigate to="/login" replace state={{ from: "/" }} />
       </SignedOut>
     </>
   );
@@ -40,7 +40,7 @@ const ClerkProtectedRoute = ({ children }) => {
 
 const CustomAuthProtectedRoute = ({ children }) => {
   const isAuthenticated = localStorage.getItem('medidiagnose_token');
-  return isAuthenticated ? children : <Navigate to="/login" />;
+  return isAuthenticated ? children : <Navigate to="/login" replace state={{ from: "/" }} />;
 };
 
 const App = () => {
@@ -53,7 +53,7 @@ const App = () => {
             <Navbar>
               {/* Add Clerk auth buttons to your navbar */}
               <SignedOut>
-                <SignInButton mode="modal" />
+                <SignInButton mode="modal" afterSignInUrl="/" afterSignUpUrl="/" />
               </SignedOut>
               <SignedIn>
                 <UserButton afterSignOutUrl="/" />
