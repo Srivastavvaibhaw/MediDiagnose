@@ -149,7 +149,7 @@ const ImageUpload = ({ onImageChange }) => {
     console.log('Problem Description:', problemDescription);
     
     try {
-      const response = await fetch('https://disease-diagnosis-app.onrender.com', {
+      const response = await fetch('https://disease-diagnosis-app.onrender.com/symptom-check', {
         method: 'POST',
         body: formData,
       });
