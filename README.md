@@ -1,4 +1,4 @@
-# MediDiagnose - Fast, AI-powered health insights at your fingertips.
+# MediDiagnose - Health insights at your fingertips.
 
 ![App Screenshot](frontend/public/assets/imageupload.png)
 
