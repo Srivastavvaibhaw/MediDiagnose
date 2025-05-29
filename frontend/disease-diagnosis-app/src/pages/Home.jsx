@@ -190,7 +190,7 @@ const Home = () => {
                 <Box className="hero-image-container">
                   <div className="hero-image-background"></div>
                   <img 
-                    src="/src/assets/illustration.jpg" 
+                    src="//assets/illustration.jpg" 
                     alt="Medical diagnosis illustration" 
                     className="hero-image"
                   />
@@ -220,7 +220,7 @@ const Home = () => {
               {['partner1.png', 'partner2.png', 'partner3.png', 'partner4.webp', 'partner5.png'].map((logo, index) => (
                 <Grid item key={index}>
                   <img 
-                    src={`src/assets/partners/${logo}`} 
+                    src={`/assets/partners/${logo}`} 
                     alt={`Healthcare partner ${index + 1}`} 
                     className="partner-logo"
                   />
@@ -306,7 +306,7 @@ const Home = () => {
                       Take a clear photo of the affected area and upload it to our secure platform. Our system supports multiple image formats for your convenience.
                     </Typography>
                     <img 
-                      src="src/assets/imageupload.png" 
+                      src="/assets/imageupload.png" 
                       alt="Upload medical image" 
                       className="step-image"
                     />
@@ -325,7 +325,7 @@ const Home = () => {
                       Provide details about your symptoms, duration, and any other relevant information. Our smart form adapts to your inputs for comprehensive analysis.
                     </Typography>
                     <img 
-                      src="src/assets/Describe Symptoms.png" 
+                      src="/assets/Describe Symptoms.png" 
                       alt="Describe symptoms" 
                       className="step-image"
                     />
@@ -344,7 +344,7 @@ const Home = () => {
                       Receive preliminary diagnosis and actionable recommendations from our AI-powered system within minutes. Save, print, or share your results with healthcare providers.
                     </Typography>
                     <img 
-                      src="src/assets/result.jpg" 
+                      src="/assets/result.jpg" 
                       alt="Get diagnosis results" 
                       className="step-image"
                     />
@@ -467,7 +467,7 @@ const Home = () => {
                     href="https://www.apple.com/in/app-store/"
                   >
                     <img 
-                      src="src/assets/download.png" 
+                      src="/assets/download.png" 
                       alt="Download on App Store" 
                       className="store-icon"
                     />
@@ -480,7 +480,7 @@ const Home = () => {
                     href="https://play.google.com/store/games?hl=en_IN&pli=1"
                   >
                     <img 
-                      src="src/assets/play store.png" 
+                      src="/assets/play store.png" 
                       alt="Get it on Google Play" 
                       className="store-icon"
                     />
@@ -491,7 +491,7 @@ const Home = () => {
             <Grid item xs={12} md={6}>
               <Box className="app-showcase">
                 <img 
-                  src="src/assets/app.jpg" 
+                  src="/assets/app.jpg" 
                   alt="MediDiagnose mobile app" 
                   className="app-image"
                 />

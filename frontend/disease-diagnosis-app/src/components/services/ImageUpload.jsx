@@ -403,7 +403,7 @@ const ImageUpload = ({ onImageChange }) => {
         doc.rect(0, 0, pageWidth, 25, 'F'); // Increased height to accommodate logo
 
         // Add logo in top left corner
-        const logoUrl = 'src/assets/logo.png'; // Adjust path based on your project structure
+        const logoUrl = '/assets/logo.png'; // Adjust path based on your project structure
         try {
           doc.addImage(logoUrl, 'PNG', margin, 5, 30, 15); // Logo: 30mm wide, 15mm tall
         } catch (error) {

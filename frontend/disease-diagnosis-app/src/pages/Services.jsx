@@ -210,7 +210,7 @@ const Services = () => {
                 }
               }}
             >
-              <img src="src/assets/ai.jpg" alt="AI Diagnosis" />
+              <img src="/assets/ai.jpg" alt="AI Diagnosis" />
             </CardMedia>
             <CardContent>
               <Typography variant="h6" gutterBottom>AI-Powered Analysis</Typography>
@@ -236,7 +236,7 @@ const Services = () => {
                 }
               }}
             >
-              <img src="src/assets/Doctor Connection.png" alt="Doctor Connection" />
+              <img src="/assets/Doctor Connection.png" alt="Doctor Connection" />
             </CardMedia>
             <CardContent>
               <Typography variant="h6" gutterBottom>Connect with Specialists</Typography>
@@ -262,7 +262,7 @@ const Services = () => {
                 }
               }}
             >
-              <img src="src/assets/Secure Data.jpg" alt="Secure Data" />
+              <img src="/assets/Secure Data.jpg" alt="Secure Data" />
             </CardMedia>
             <CardContent>
               <Typography variant="h6" gutterBottom>Privacy & Security</Typography>
