@@ -19,7 +19,8 @@ const allowedOrigins = [
   'http://34.213.214.55',
   'http://35.164.95.156',
   'http://44.230.95.183',
-  'http://44.229.200.200'
+  'http://44.229.200.200',
+  'https://disease-diagnosis-66vxbecdg-vaibhawteach12-gmailcoms-projects.vercel.app'
 ];
 
 app.use(cors({
