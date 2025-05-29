@@ -190,7 +190,7 @@ const Home = () => {
                 <Box className="hero-image-container">
                   <div className="hero-image-background"></div>
                   <img 
-                    src="//assets/illustration.jpg" 
+                    src="/assets/illus.jpg" 
                     alt="Medical diagnosis illustration" 
                     className="hero-image"
                   />
