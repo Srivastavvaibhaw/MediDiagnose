@@ -1,0 +1,105 @@
+/* src/styles/pages/SignupSuccess.css */
+.success-container {
+  padding: 40px 16px;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.success-paper {
+  padding: 32px;
+  border-radius: 16px;
+  text-align: center;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.success-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.success-logo {
+  font-size: 48px;
+  color: var(--primary-color);
+  margin-bottom: 16px;
+}
+
+.success-icon {
+  font-size: 72px;
+  color: var(--success-color);
+  margin-bottom: 24px;
+  animation: scaleIn 0.5s ease-in-out;
+}
+
+.success-title {
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.success-subtitle {
+  color: var(--text-secondary);
+}
+
+.success-content {
+  margin-top: 32px;
+}
+
+.success-message {
+  margin-bottom: 32px;
+}
+
+.success-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 320px;
+  margin: 0 auto;
+}
+
+.login-now-button {
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  text-transform: none;
+  font-size: 16px;
+}
+
+.home-button {
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 500;
+  text-transform: none;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@media (max-width: 600px) {
+  .success-paper {
+    padding: 24px;
+  }
+  
+  .success-icon {
+    font-size: 64px;
+  }
+}

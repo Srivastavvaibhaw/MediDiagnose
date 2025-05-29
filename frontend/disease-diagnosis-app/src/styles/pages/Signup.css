@@ -1,0 +1,255 @@
+/* src/styles/pages/Signup.css */
+.signup-container {
+  padding: 40px 16px;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.signup-paper {
+  padding: 32px;
+  border-radius: 16px;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.signup-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.signup-logo {
+  font-size: 48px;
+  color: var(--primary-color);
+  margin-bottom: 16px;
+}
+
+.signup-title {
+  font-weight: 700;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.signup-subtitle {
+  color: var(--text-secondary);
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.signup-stepper {
+  margin-bottom: 24px;
+}
+
+.signup-form {
+  margin-top: 16px;
+}
+
+.signup-input {
+  margin-bottom: 16px;
+}
+
+.signup-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 24px;
+  margin-bottom: 16px;
+}
+
+.back-button {
+  text-transform: none;
+}
+
+.next-button,
+.signup-button {
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  text-transform: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.next-button:hover,
+.signup-button:hover {
+  transform: translateY(-2px);
+}
+
+.signup-divider-container {
+  margin: 24px 0;
+}
+
+.signup-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.divider-text {
+  padding: 0 16px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.social-signup-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.social-signup-button {
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: 500;
+  text-transform: none;
+  width: 100%;
+}
+
+.social-signup-button.google {
+  color: #4285F4;
+  border-color: #4285F4;
+}
+
+.social-signup-button.facebook {
+  color: #3b5998;
+  border-color: #3b5998;
+}
+
+.social-signup-button.apple {
+  color: #000;
+  border-color: #000;
+}
+
+.login-prompt {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.login-text {
+  color: var(--text-secondary);
+}
+
+.login-link {
+  color: var(--primary-color);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.login-link:hover {
+  text-decoration: underline;
+}
+
+.signup-alert {
+  margin-bottom: 16px;
+  animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+.confirmation-step {
+  margin-top: 16px;
+}
+
+.confirmation-summary {
+  background-color: rgba(0, 0, 0, 0.02);
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+}
+
+.summary-title {
+  margin-bottom: 16px;
+  font-weight: 600;
+}
+
+.summary-item {
+  display: flex;
+  margin-bottom: 12px;
+}
+
+.summary-item > :first-child {
+  font-weight: 600;
+  width: 120px;
+}
+
+.terms-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shake {
+  10%, 90% {
+    transform: translate3d(-1px, 0, 0);
+  }
+  20%, 80% {
+    transform: translate3d(2px, 0, 0);
+  }
+  30%, 50%, 70% {
+    transform: translate3d(-3px, 0, 0);
+  }
+  40%, 60% {
+    transform: translate3d(3px, 0, 0);
+  }
+}
+
+@media (max-width: 600px) {
+  .signup-paper {
+    padding: 24px;
+  }
+  
+  .signup-logo {
+    font-size: 40px;
+  }
+  
+ .signup-stepper {
+  margin-bottom: 24px;
+}
+
+.signup-stepper .MuiStepLabel-root {
+  flex-direction: column;
+}
+
+.signup-stepper .MuiStepLabel-iconContainer {
+  padding-right: 0;
+  margin-bottom: 8px;
+}
+
+.signup-stepper .MuiStepIcon-root {
+  color: var(--primary-light);
+}
+
+.signup-stepper .MuiStepIcon-root.Mui-active {
+  color: var(--primary-color);
+}
+
+.signup-stepper .MuiStepIcon-root.Mui-completed {
+  color: var(--success-color);
+}
+
+.signup-stepper .MuiStepLabel-label {
+  font-size: 14px;
+}
+
+@media (max-width: 600px) {
+  .signup-stepper .MuiStepLabel-label {
+    font-size: 12px;
+  }
+  
+  .signup-stepper .MuiStepIcon-root {
+    font-size: 20px;
+  }
+}

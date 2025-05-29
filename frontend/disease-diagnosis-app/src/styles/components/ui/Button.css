@@ -1,0 +1,45 @@
+/* src/styles/components/ui/Button.css */
+.custom-button {
+  position: relative;
+  text-transform: none;
+  font-weight: 500;
+  border-radius: 8px;
+  transition: all 0.2s ease-in-out;
+}
+
+.custom-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.custom-button.loading {
+  pointer-events: none;
+}
+
+.button-loader {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin-left: -12px;
+  margin-top: -12px;
+}
+
+.button-text-loading {
+  visibility: hidden;
+}
+
+.custom-button.MuiButton-containedPrimary {
+  background: linear-gradient(45deg, #3f51b5 30%, #5c6bc0 90%);
+}
+
+.custom-button.MuiButton-containedSecondary {
+  background: linear-gradient(45deg, #f50057 30%, #ff4081 90%);
+}
+
+.custom-button.MuiButton-outlinedPrimary {
+  border-width: 2px;
+}
+
+.custom-button.MuiButton-outlinedSecondary {
+  border-width: 2px;
+}

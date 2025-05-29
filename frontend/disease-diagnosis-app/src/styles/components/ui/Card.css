@@ -1,0 +1,47 @@
+/* src/styles/components/ui/Card.css */
+.custom-card {
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.custom-card.clickable {
+  cursor: pointer;
+}
+
+.custom-card.clickable:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+  padding: 16px 16px 8px 16px;
+}
+
+.card-title {
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.card-subheader {
+  margin-top: 4px;
+  font-size: 0.875rem;
+}
+
+.card-media {
+  object-fit: cover;
+}
+
+.card-content {
+  padding: 16px;
+}
+
+.card-actions {
+  padding: 8px 16px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.card-header-action {
+  margin-right: -8px;
+}

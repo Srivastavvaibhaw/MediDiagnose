@@ -1,0 +1,318 @@
+/* src/styles/components/services/SymptomForm.css */
+:root {
+  --form-bg: #ffffff;
+  --form-text: #475569;
+  --form-heading: #1e293b;
+  --form-accent: #4f46e5;
+  --form-border: #e2e8f0;
+  --form-border-focus: #4f46e5;
+  --form-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+  --form-shadow-hover: 0 15px 30px rgba(0, 0, 0, 0.1);
+  --form-transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  --form-radius: 16px;
+  --input-radius: 8px;
+  --chip-bg: rgba(79, 70, 229, 0.1);
+  --chip-text: #4f46e5;
+}
+
+.symptoms-form-wrapper {
+  background-color: var(--form-bg);
+  border-radius: var(--form-radius);
+  box-shadow: var(--form-shadow);
+  padding: 2rem;
+  transition: var(--form-transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.symptoms-form-wrapper:hover {
+  box-shadow: var(--form-shadow-hover);
+}
+
+.symptoms-form-wrapper::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 5px;
+  background: linear-gradient(to right, #4f46e5, #7c3aed);
+}
+
+.symptoms-form-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.symptoms-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--form-heading);
+  position: relative;
+  display: inline-block;
+}
+
+.symptoms-title::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 0;
+  width: 30px;
+  background: linear-gradient(to right, #4f46e5, #7c3aed);
+  border-radius: 2px;
+}
+
+.symptoms-form {
+  margin-top: 1.5rem;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--form-heading);
+  margin-bottom: 0.75rem;
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  font-size: 1rem;
+  color: var(--form-heading);
+  background-color: #f8fafc;
+  border: 1px solid var(--form-border);
+  border-radius: var(--input-radius);
+  transition: var(--form-transition);
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--form-border-focus);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+  background-color: #ffffff;
+}
+
+.form-control::placeholder {
+  color: #94a3b8;
+}
+
+.symptoms-textarea {
+  min-height: 150px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.form-select-wrapper {
+  position: relative;
+}
+
+.form-select {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  font-size: 1rem;
+  color: var(--form-heading);
+  background-color: #f8fafc;
+  border: 1px solid var(--form-border);
+  border-radius: var(--input-radius);
+  appearance: none;
+  transition: var(--form-transition);
+}
+
+.form-select:focus {
+  outline: none;
+  border-color: var(--form-border-focus);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+  background-color: #ffffff;
+}
+
+.select-arrow {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: #94a3b8;
+}
+
+.symptoms-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.symptom-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background-color: var(--chip-bg);
+  color: var(--chip-text);
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: var(--form-transition);
+}
+
+.symptom-chip:hover {
+  background-color: rgba(79, 70, 229, 0.15);
+  transform: translateY(-2px);
+}
+
+.chip-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  background-color: rgba(79, 70, 229, 0.2);
+  border-radius: 50%;
+  margin-left: 0.5rem;
+  cursor: pointer;
+  transition: var(--form-transition);
+}
+
+.chip-remove:hover {
+  background-color: rgba(79, 70, 229, 0.3);
+  transform: scale(1.1);
+}
+
+.severity-slider {
+  width: 100%;
+  margin: 1.5rem 0;
+}
+
+.slider-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.slider {
+  flex: 1;
+  height: 6px;
+  background-color: #e2e8f0;
+  border-radius: 3px;
+  position: relative;
+}
+
+.slider-track {
+  position: absolute;
+  height: 100%;
+  background: linear-gradient(to right, #4f46e5, #7c3aed);
+  border-radius: 3px;
+}
+
+.slider-thumb {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background-color: white;
+  border: 2px solid #4f46e5;
+  border-radius: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: var(--form-transition);
+}
+
+.slider-thumb:hover {
+  transform: translate(-50%, -50%) scale(1.1);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+}
+
+.slider-value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--form-heading);
+  min-width: 40px;
+  text-align: center;
+}
+
+.severity-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+}
+
+.severity-label {
+  font-size: 0.8rem;
+  color: var(--form-text);
+}
+
+.form-help {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.form-row {
+  display: flex;
+  gap: 1rem;
+}
+
+.form-group-half {
+  flex: 1;
+}
+
+.form-submit {
+  margin-top: 1.5rem;
+}
+
+.submit-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 0.875rem 1.5rem;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  color: white;
+  border: none;
+  border-radius: var(--input-radius);
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--form-transition);
+  box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);
+}
+
+.submit-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(79, 70, 229, 0.4);
+}
+
+.submit-button-icon {
+  margin-left: 0.5rem;
+}
+
+.form-note {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background-color: rgba(245, 158, 11, 0.1);
+  border-left: 3px solid #f59e0b;
+  border-radius: 6px;
+}
+
+.note-text {
+  font-size: 0.9rem;
+  color: #92400e;
+  line-height: 1.5;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .symptoms-form-wrapper {
+    padding: 1.5rem;
+  }
+  
+  .form-row {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+}
