@@ -12,8 +12,11 @@ const port = process.env.PORT || 3030;
 // CORS setup with allowed origins
 const allowedOrigins = [
   'http://localhost:10000',
+  'http://localhost:3000',
+  'http://localhost:5173',  // Vite default port
   'https://disease-diagnosis-app.onrender.com',
   'https://disease-diagnosis-app.vercel.app',
+  'https://api.medidiagnose.com',
   'http://44.226.145.213',
   'http://54.187.200.255',
   'http://34.213.214.55',
