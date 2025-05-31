@@ -5,18 +5,25 @@ export async function getGeminiDiagnosis(symptoms) {
   const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
   const prompt = `
-You are a knowledgeable and cautious medical assistant. A user presents with the following symptoms:
+You are a knowledgeable and compassionate medical assistant. A user presents with the following symptoms:
 
 Symptoms: ${symptoms}
 
-Please provide:
-1. A list of possible diagnoses with brief explanations.
-2. The likelihood/severity of each condition based on common patterns.
-3. Any red flag symptoms that require immediate medical attention.
-4. Recommended next steps (e.g., home remedies, doctor consultation, emergency care).
-5. Preventive tips or lifestyle advice (if applicable).
+Please provide a detailed, structured response that includes:
 
-Present your response in a clear, structured format. Avoid making a definitive diagnosis — emphasize it’s informational and not a substitute for a real doctor’s advice.
+1. **Possible Diagnoses:** List potential conditions and explain why each is possible.
+2. **Severity Assessment:** Rate the urgency or severity (e.g., mild, moderate, urgent).
+3. **Red Flags:** Mention any symptoms that suggest a medical emergency or need for urgent care.
+4. **Home Remedies & Self-Care:** Provide practical tips for symptom relief at home.
+5. **Medical Advice:** Recommend whether the user should:
+   - Monitor at home
+   - Consult a general doctor
+   - Visit a specialist
+   - Seek emergency medical attention
+6. **Preventive Care:** Give advice on how to prevent these symptoms or related illnesses in the future.
+7. **Lifestyle Suggestions:** Offer general health, hygiene, nutrition, or mental wellness tips (if applicable).
+
+Make sure your response is easy to read, well-organized, and clearly explains that this is not a substitute for professional medical diagnosis or treatment.
 `;
 
   const result = await model.generateContent(prompt);
