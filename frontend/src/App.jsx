@@ -68,18 +68,6 @@ const App = () => {
                 <Route path="/about" element={<About />} />
                 <Route path="/contact" element={<Contact />} />
                 
-               
-                {/* Routes protected by Clerk auth */}
-                <Route 
-                  path="/dashboard" 
-                  element={
-                    <ClerkProtectedRoute>
-                      {/* <Dashboard /> */}
-                      <div>Dashboard (Clerk Protected)</div>
-                    </ClerkProtectedRoute>
-                  } 
-                />
-                
                 {/* Routes protected by custom auth */}
                 <Route 
                   path="/profile" 

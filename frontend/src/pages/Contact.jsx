@@ -212,9 +212,9 @@ const Contact = () => {
   };
   
   const contactInfo = {
-    email: 'support@medidiagnose.com',
-    phone: '+1 (555) 123-4567',
-    address: '123 Health Tech Plaza, Suite 400, San Francisco, CA 94103'
+    email: 'sup@medidiagnose.com',
+    phone: '+91(555) 123-4567',
+    address: '123 Health Tech Plaza, Suite 400, Delhi, India'
   };
   
   const faqs = [
