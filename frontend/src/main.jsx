@@ -29,7 +29,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <ClerkProvider 
       publishableKey={PUBLISHABLE_KEY}
-      afterSignInUrl="/dashboard"
+      afterSignInUrl="/"
       afterSignOutUrl="/"
     >
       {/* Wrap your app in custom context if needed */}
