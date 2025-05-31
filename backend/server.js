@@ -11,32 +11,52 @@ const port = process.env.PORT || 3030;
 
 // CORS setup with allowed origins
 const allowedOrigins = [
+  // Local development
   'http://localhost:10000',
   'http://localhost:3000',
   'http://localhost:5173',  // Vite default port
+  
+  // Production domains
   'https://disease-diagnosis-app.onrender.com',
+  'https://disease-diagnosis-app.render.com',
   'https://disease-diagnosis-app.vercel.app',
   'https://api.medidiagnose.com',
+  
+  // Render.com static IP addresses
   'http://44.226.145.213',
   'http://54.187.200.255',
   'http://34.213.214.55',
   'http://35.164.95.156',
   'http://44.230.95.183',
-  'http://44.229.200.200',
-  'https://disease-diagnosis-66vxbecdg-vaibhawteach12-gmailcoms-projects.vercel.app'
+  'http://44.229.200.200'
 ];
 
 app.use(cors({
   origin: function(origin, callback) {
     // Allow requests with no origin (like mobile apps, curl, etc.)
     if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
+    
+    // Allow all localhost origins
+    if (origin.startsWith('http://localhost:')) {
+      return callback(null, true);
     }
+    
+    // Allow Vercel preview deployments
+    if (origin.includes('vercel.app')) {
+      return callback(null, true);
+    }
+    
+    // Check against explicit allowed origins
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      return callback(null, true);
+    }
+    
+    console.log(`CORS error: Origin ${origin} not allowed`);
+    callback(new Error('Not allowed by CORS'));
   },
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 // Initialize Gemini AI
