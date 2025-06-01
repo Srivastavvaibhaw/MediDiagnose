@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { 
@@ -32,7 +31,6 @@ import ZoomInIcon from '@mui/icons-material/ZoomIn';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import GetAppIcon from '@mui/icons-material/GetApp';
-import ReactMarkdown from 'react-markdown';
 import { jsPDF } from 'jspdf';
 import '../../styles/components/services/ImageUpload.css';
 
@@ -54,11 +52,9 @@ const ImageUpload = ({ onImageChange }) => {
   const fileInputRef = useRef(null);
   const dropAreaRef = useRef(null);
 
-  // Get user data from Clerk
   const { user } = useUser();
   const patientName = user?.fullName || `${user?.firstName || ''} ${user?.lastName || ''}`.trim() || 'Anonymous Patient';
 
-  // Sample symptoms list
   const symptomsList = [
     'Rash',
     'Swelling',
@@ -70,13 +66,11 @@ const ImageUpload = ({ onImageChange }) => {
     'Blisters'
   ];
   
-  // Sanitize text to remove asterisks
   const sanitizeText = (text) => {
     if (typeof text !== 'string') return text;
     return text.replace(/\*/g, '');
   };
 
-  // Simulate upload progress
   useEffect(() => {
     if (isUploading) {
       const timer = setInterval(() => {
@@ -101,7 +95,6 @@ const ImageUpload = ({ onImageChange }) => {
     }
   }, [isUploading]);
 
-  // Setup drag and drop event listeners
   useEffect(() => {
     const dropArea = dropAreaRef.current;
     
@@ -142,12 +135,13 @@ const ImageUpload = ({ onImageChange }) => {
     formData.append('symptoms', JSON.stringify(symptoms.map(sanitizeText)));
     formData.append('description', sanitizeText(problemDescription));
     
-    console.log('Data being sent to backend:');
-    console.log('File Name:', file.name);
-    console.log('File Size:', (file.size / (1024 * 1024)).toFixed(2), 'MB');
-    console.log('File Type:', file.type);
-    console.log('Selected Symptoms:', symptoms);
-    console.log('Problem Description:', problemDescription);
+    console.log('Data being sent to backend:', {
+      fileName: file.name,
+      fileSize: (file.size / (1024 * 1024)).toFixed(2) + ' MB',
+      fileType: file.type,
+      symptoms: symptoms,
+      description: problemDescription
+    });
     
     try {
       const response = await fetch('https://disease-diagnosis-app.onrender.com/symptom-check', {
@@ -174,7 +168,7 @@ const ImageUpload = ({ onImageChange }) => {
       
       setNotification({
         open: true,
-        message: 'Image and symptoms successfully sent to backend for analysis!',
+        message: 'Analysis complete! Diagnosis results available.',
         severity: 'success'
       });
       
@@ -183,7 +177,7 @@ const ImageUpload = ({ onImageChange }) => {
       console.error('Error sending data to backend:', error);
       setNotification({
         open: true,
-        message: 'Failed to send data to backend. Please try again.',
+        message: 'Failed to analyze image. Please try again.',
         severity: 'error'
       });
     }
@@ -330,273 +324,207 @@ const ImageUpload = ({ onImageChange }) => {
       return;
     }
 
-    if (patientName === 'Anonymous Patient') {
-      setNotification({
-        open: true,
-        message: 'Please log in to generate a personalized report.',
-        severity: 'warning'
-      });
-      return;
-    }
-
     try {
+      // Create a new PDF document
       const doc = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
         format: 'a4'
       });
 
-      let yPosition = 10;
-      const pageHeight = 297;
-      const pageWidth = 210;
-      const margin = 10; // Reduced margin for compact layout
-      const maxWidth = pageWidth - 2 * margin;
-      const lineHeight = 3; // Reduced for tighter spacing
-      const sectionSpacing = 2; // Minimal section spacing
+      // Constants for layout
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const margin = 15;
+      const contentWidth = pageWidth - 2 * margin;
+      const lineHeight = 5;
+      const sectionSpacing = 8;
+      let yPosition = margin;
 
-      const primaryColor = [33, 150, 243];
-      const secondaryColor = [240, 240, 240];
-      const accentColor = [100, 100, 100];
+      // Colors
+      const primaryColor = '#1976d2';
+      const secondaryColor = '#f5f5f5';
+      const textColor = '#212121';
 
-      const fallbackData = {
-        'Acne (Acne vulgaris)': {
-          description: 'This appears to be the most likely condition based on the presence of red spots and general irritation on the face.',
-          symptoms: 'Red papules/pustules on the cheek area, some containing pus.',
-          causes: 'Hormonal changes, excess oil production, bacteria (Propionibacterium acnes), lifestyle factors like stress or poor diet.',
-          recommendations: 'Gentle cleansing twice daily with a mild cleanser, use over-the-counter treatments with Benzoyl Peroxide or Salicylic Acid, avoid touching the face, moisturize with an oil-free product, consult a dermatologist if symptoms persist.'
-        },
-        'Eczema': {
-          description: 'This condition is likely due to dry, inflamed skin with intense itching, often seen in patches.',
-          symptoms: 'Dry, scaly patches, intense itching, redness, and possible oozing or crusting.',
-          causes: 'Genetic predisposition, environmental triggers (e.g., allergens, irritants), stress, and immune system dysfunction.',
-          recommendations: 'Use fragrance-free moisturizers frequently, avoid known triggers (e.g., harsh soaps), apply topical corticosteroids as prescribed, keep skin clean and hydrated, consult a dermatologist for severe cases.'
-        },
-        'Psoriasis': {
-          description: 'This appears to be a chronic autoimmune condition causing rapid skin cell turnover, leading to scaling on the skin’s surface.',
-          symptoms: 'Thick, red patches with silvery scales, dryness, and possible cracking or bleeding.',
-          causes: 'Immune system dysfunction, genetic factors, environmental triggers (e.g., stress, infections), and lifestyle factors.',
-          recommendations: 'Use moisturizers to reduce dryness, apply topical treatments like corticosteroids, avoid triggers like stress or smoking, consider phototherapy for severe cases, consult a dermatologist for systemic treatments.'
-        }
-      };
-
-      const formatDate = (date) => {
-        return date.toLocaleString('en-GB', {
-          day: '2-digit',
-          month: 'long',
-          year: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit',
-          timeZone: 'Asia/Kolkata'
-        }) + ' IST';
-      };
-
-      const checkPageBreak = (spaceNeeded) => {
-        if (yPosition + spaceNeeded > pageHeight - margin) {
+      // Improved page break check with buffer
+      const checkPageBreak = (spaceNeeded, buffer = 10) => {
+        if (yPosition + spaceNeeded > pageHeight - margin - buffer) {
           doc.addPage();
-          yPosition = 10;
+          yPosition = margin;
           addHeader();
+          return true;
         }
+        return false;
       };
 
+      // Add header with protection against overflow
       const addHeader = () => {
-        doc.setFillColor(...secondaryColor);
-        doc.rect(0, 0, pageWidth, 20, 'F'); // Reduced header height
-
-        const logoUrl = '/assets/logo.png';
-        try {
-          doc.addImage(logoUrl, 'PNG', margin, 5, 25, 12); // Smaller logo
-        } catch (error) {
-          console.error('Error adding logo to PDF:', error);
-          doc.setFillColor(...accentColor);
-          doc.rect(margin, 5, 25, 12, 'F');
-          doc.setFontSize(6);
-          doc.setTextColor(255, 255, 255);
-          doc.text('Logo Placeholder', margin + 5, 10);
-        }
-
-        doc.setFontSize(10); // Smaller header font
+        // Header background
+        doc.setFillColor(secondaryColor);
+        doc.rect(0, 0, pageWidth, 25, 'F');
+        
+        // Logo placeholder
+        doc.setFillColor(primaryColor);
+        doc.rect(margin, 5, 30, 15, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(8);
+        doc.text('MEDIDIAGNOSE', margin + 5, 15);
+        
+        // Header text
+        doc.setTextColor(textColor);
         doc.setFont('helvetica', 'bold');
-        doc.setTextColor(...primaryColor);
-        doc.text('MediDiagnose Medical Report', margin + 30, 12);
-        yPosition = 15;
-        doc.setLineWidth(0.2);
-        doc.setDrawColor(...primaryColor);
-        doc.line(margin, yPosition, pageWidth - margin, yPosition);
-        yPosition += 2;
-        doc.setTextColor(0, 0, 0);
+        doc.setFontSize(14);
+        doc.text('Medical Diagnosis Report', margin + 35, 15);
+        
+        // Divider line
+        doc.setDrawColor(primaryColor);
+        doc.setLineWidth(0.5);
+        doc.line(margin, 25, pageWidth - margin, 25);
+        
+        yPosition = 30;
       };
 
+      // Safe text addition with overflow protection
+      const addText = (text, x, y, maxWidth, align = 'left') => {
+        const lines = doc.splitTextToSize(text, maxWidth);
+        lines.forEach((line, i) => {
+          // Check if we need a new page before adding each line
+          if (i > 0 && checkPageBreak(lineHeight)) {
+            y = yPosition;
+          }
+          doc.text(line, x, y + (i * lineHeight), { align });
+        });
+        return lines.length * lineHeight;
+      };
+
+      // Add section with title
+      const addSection = (title) => {
+        checkPageBreak(15);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(12);
+        doc.setTextColor(primaryColor);
+        doc.text(title, margin, yPosition);
+        doc.setDrawColor(primaryColor);
+        doc.setLineWidth(0.3);
+        doc.line(margin, yPosition + 1, margin + 20, yPosition + 1);
+        yPosition += 5;
+      };
+
+      // Add paragraph with proper spacing
+      const addParagraph = (text, isBold = false) => {
+        doc.setFont('helvetica', isBold ? 'bold' : 'normal');
+        doc.setFontSize(10);
+        doc.setTextColor(textColor);
+        
+        const heightUsed = addText(text, margin, yPosition, contentWidth);
+        yPosition += heightUsed + 2;
+      };
+
+      // Add key-value pair with overflow protection
+      const addKeyValue = (key, value) => {
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(10);
+        doc.setTextColor(textColor);
+        
+        // First write the key
+        doc.text(key + ':', margin, yPosition);
+        
+        // Then the value with proper wrapping
+        const valueLines = doc.splitTextToSize(value, contentWidth - 20);
+        valueLines.forEach((line, i) => {
+          if (i === 0) {
+            doc.setFont('helvetica', 'normal');
+            doc.text(line, margin + 15, yPosition);
+          } else {
+            if (checkPageBreak(lineHeight)) {
+              yPosition = margin + 10;
+            }
+            doc.text(line, margin, yPosition + lineHeight);
+          }
+        });
+        
+        yPosition += (valueLines.length * lineHeight) + 2;
+      };
+
+      // Add list items with proper numbering
+      const addListItems = (items) => {
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(10);
+        doc.setTextColor(textColor);
+        
+        items.forEach((item, index) => {
+          const bullet = `${index + 1}.`;
+          const fullText = `${bullet} ${item}`;
+          
+          const lines = doc.splitTextToSize(fullText, contentWidth - 5);
+          lines.forEach((line, i) => {
+            if (checkPageBreak(lineHeight)) {
+              yPosition = margin;
+            }
+            doc.text(line, margin, yPosition);
+            yPosition += lineHeight;
+          });
+          
+          yPosition += 2;
+        });
+      };
+
+      // Initialize with header
       addHeader();
 
-      // Report Metadata
-      doc.setFontSize(8); // Smaller metadata font
-      doc.setFont('helvetica', 'normal');
-      doc.text('Report Generated: ' + formatDate(new Date()), margin, yPosition);
-      yPosition += lineHeight;
-      doc.text('MediDiagnose - AI-Powered Health Diagnostics', margin, yPosition);
-      yPosition += sectionSpacing;
+      // 1. Patient Information
+      addSection('Patient Information');
+      addKeyValue('Patient Name', sanitizeText(patientName));
+      addKeyValue('Report Date', new Date().toLocaleString());
 
-      // Patient Information
-      doc.setFontSize(10);
-      doc.setFont('helvetica', 'bold');
-      doc.setTextColor(...primaryColor);
-      checkPageBreak(10);
-      doc.text('Patient Information', margin, yPosition);
-      doc.setDrawColor(...primaryColor);
-      doc.line(margin, yPosition + 0.5, margin + 30, yPosition + 0.5);
-      yPosition += lineHeight + 1;
-      doc.setFontSize(8);
-      doc.setTextColor(0, 0, 0);
-      doc.setFont('helvetica', 'normal');
-      const sanitizedPatientName = sanitizeText(patientName).replace(/[^a-zA-Z0-9\s]/g, '');
-      let lines = doc.splitTextToSize(`Name: ${sanitizedPatientName}`, maxWidth);
-      checkPageBreak(lineHeight * lines.length);
-      doc.text(lines, margin, yPosition);
-      yPosition += lineHeight * lines.length;
-      lines = doc.splitTextToSize('Date of Analysis: ' + (diagnosisResult.analyzedAt ? formatDate(new Date(diagnosisResult.analyzedAt)) : 'Not Available'), maxWidth);
-      checkPageBreak(lineHeight * lines.length);
-      doc.text(lines, margin, yPosition);
-      yPosition += lineHeight * lines.length + sectionSpacing;
+      // 2. Diagnosis Summary
+      addSection('Diagnosis Summary');
+      const diagnosis = sanitizeText(diagnosisResult.diagnosis) || 'Condition requiring further evaluation';
+      addParagraph(`Primary Diagnosis: ${diagnosis}`, true);
+      addParagraph(sanitizeText(diagnosisResult.description) || 'Based on the provided image and symptoms, this appears to be the most likely condition.');
 
-      // Diagnosis Overview
-      doc.setFontSize(10);
-      doc.setFont('helvetica', 'bold');
-      doc.setTextColor(...primaryColor);
-      checkPageBreak(10);
-      doc.text('Diagnosis Overview', margin, yPosition);
-      doc.setDrawColor(...primaryColor);
-      doc.line(margin, yPosition + 0.5, margin + 30, yPosition + 0.5);
-      yPosition += lineHeight + 1;
-      const diagnosis = sanitizeText(diagnosisResult.diagnosis) || 'Unknown Condition';
-      const diagnosisData = {
-        description: sanitizeText(diagnosisResult.description || fallbackData[diagnosis]?.description || ''),
-        symptoms: sanitizeText(diagnosisResult.symptoms || fallbackData[diagnosis]?.symptoms || 'No specific symptoms identified.'),
-        causes: sanitizeText(diagnosisResult.causes || fallbackData[diagnosis]?.causes || 'No specific causes identified.'),
-        recommendations: sanitizeText(diagnosisResult.recommendations || fallbackData[diagnosis]?.recommendations || 'Consult a healthcare professional for personalized advice.')
-      };
-      doc.setFontSize(8);
-      doc.setTextColor(0, 0, 0);
-      doc.setFont('helvetica', 'normal');
-      lines = doc.splitTextToSize('Condition: ' + diagnosis, maxWidth);
-      checkPageBreak(lineHeight * lines.length);
-      doc.text(lines, margin, yPosition);
-      yPosition += lineHeight * lines.length;
-      lines = doc.splitTextToSize(diagnosisData.description, maxWidth);
-      checkPageBreak(lineHeight * lines.length);
-      doc.text(lines, margin, yPosition);
-      yPosition += lineHeight * lines.length + sectionSpacing;
+      // 3. Reported Symptoms
+      addSection('Reported Symptoms');
+      addKeyValue('Patient Reported', selectedSymptoms.join(', '));
+      addKeyValue('Identified Symptoms', sanitizeText(diagnosisResult.symptoms) || 'Not specified');
 
-      // Reported Symptoms
-      doc.setFontSize(10);
-      doc.setFont('helvetica', 'bold');
-      doc.setTextColor(...primaryColor);
-      checkPageBreak(10);
-      doc.text('Reported Symptoms', margin, yPosition);
-      doc.setDrawColor(...primaryColor);
-      doc.line(margin, yPosition + 0.5, margin + 30, yPosition + 0.5);
-      yPosition += lineHeight + 1;
-      doc.setFontSize(8);
-      doc.setTextColor(0, 0, 0);
-      doc.setFont('helvetica', 'normal');
-      lines = doc.splitTextToSize('Symptoms Reported by Patient: ' + selectedSymptoms.map(sanitizeText).join(', ') + '.', maxWidth);
-      checkPageBreak(lineHeight * lines.length);
-      doc.text(lines, margin, yPosition);
-      yPosition += lineHeight * lines.length;
-      lines = doc.splitTextToSize('Analyzed Symptoms: ' + diagnosisData.symptoms, maxWidth);
-      checkPageBreak(lineHeight * lines.length);
-      doc.text(lines, margin, yPosition);
-      yPosition += lineHeight * lines.length + sectionSpacing;
+      // 4. Patient Description
+      if (problemDescription.trim()) {
+        addSection('Patient Description');
+        addParagraph(sanitizeText(problemDescription));
+      }
 
-      // Patient’s Description of Problem
-      doc.setFontSize(10);
-      doc.setFont('helvetica', 'bold');
-      doc.setTextColor(...primaryColor);
-      checkPageBreak(10);
-      doc.text('Patient’s Description of Problem', margin, yPosition);
-      doc.setDrawColor(...primaryColor);
-      doc.line(margin, yPosition + 0.5, margin + 40, yPosition + 0.5);
-      yPosition += lineHeight + 1;
-      doc.setFontSize(8);
-      doc.setTextColor(0, 0, 0);
-      doc.setFont('helvetica', 'normal');
-      lines = doc.splitTextToSize(sanitizeText(problemDescription), maxWidth);
-      checkPageBreak(lineHeight * lines.length);
-      doc.text(lines, margin, yPosition);
-      yPosition += lineHeight * lines.length + sectionSpacing;
+      // 5. Possible Causes
+      if (diagnosisResult.causes) {
+        addSection('Possible Causes');
+        const causes = sanitizeText(diagnosisResult.causes).split('. ')
+          .filter(cause => cause.trim().length > 0)
+          .map(cause => cause.trim() + (cause.endsWith('.') ? '' : '.'));
+        addListItems(causes);
+      }
 
-      // Possible Causes
-      doc.setFontSize(10);
-      doc.setFont('helvetica', 'bold');
-      doc.setTextColor(...primaryColor);
-      checkPageBreak(10);
-      doc.text('Possible Causes', margin, yPosition);
-      doc.setDrawColor(...primaryColor);
-      doc.line(margin, yPosition + 0.5, margin + 25, yPosition + 0.5);
-      yPosition += lineHeight + 1;
-      doc.setFontSize(8);
-      doc.setTextColor(0, 0, 0);
-      const causes = sanitizeText(diagnosisData.causes).split(', ').map(cause => cause.trim());
-      causes.forEach((cause, index) => {
-        const number = `${index + 1}.`;
-        const causeText = cause;
-        doc.setFont('helvetica', 'bold');
-        checkPageBreak(lineHeight);
-        doc.text(number, margin, yPosition);
-        doc.setFont('helvetica', 'normal');
-        lines = doc.splitTextToSize(causeText, maxWidth - 8);
-        checkPageBreak(lineHeight * lines.length);
-        doc.text(lines, margin + 4, yPosition);
-        yPosition += lineHeight * lines.length;
-      });
-      yPosition += sectionSpacing;
+      // 6. Recommendations
+      addSection('Recommendations');
+      const recommendations = sanitizeText(diagnosisResult.recommendations || 'Consult a healthcare professional').split('. ')
+        .filter(rec => rec.trim().length > 0)
+        .map(rec => rec.trim() + (rec.endsWith('.') ? '' : '.'));
+      addListItems(recommendations.length > 0 ? recommendations : ['No specific recommendations available.']);
 
-      // Recommendations
-      doc.setFontSize(10);
-      doc.setFont('helvetica', 'bold');
-      doc.setTextColor(...primaryColor);
-      checkPageBreak(10);
-      doc.text('Recommendations', margin, yPosition);
-      doc.setDrawColor(...primaryColor);
-      doc.line(margin, yPosition + 0.5, margin + 25, yPosition + 0.5);
-      yPosition += lineHeight + 1;
-      doc.setFontSize(8);
-      doc.setTextColor(0, 0, 0);
-      const recommendations = sanitizeText(diagnosisData.recommendations).split(', ').map(rec => rec.trim());
-      recommendations.forEach((rec, index) => {
-        const number = `${index + 1}.`;
-        const recText = rec;
-        doc.setFont('helvetica', 'bold');
-        checkPageBreak(lineHeight);
-        doc.text(number, margin, yPosition);
-        doc.setFont('helvetica', 'normal');
-        lines = doc.splitTextToSize(recText, maxWidth - 8);
-        checkPageBreak(lineHeight * lines.length);
-        doc.text(lines, margin + 4, yPosition);
-        yPosition += lineHeight * lines.length;
-      });
-      yPosition += sectionSpacing;
+      // 7. Disclaimer
+      addSection('Important Notes');
+      addParagraph('This report is generated by artificial intelligence and should not be considered a substitute for professional medical advice, diagnosis, or treatment. Always seek the advice of your physician or other qualified health provider with any questions you may have regarding a medical condition.', true);
+      addParagraph(`Report generated by MediDiagnose AI - ${new Date().toLocaleString()}`);
 
       // Footer
-      doc.setFontSize(7); // Smaller footer font
-      doc.setTextColor(...accentColor);
-      doc.setFont('helvetica', 'normal');
-      checkPageBreak(10);
-      lines = doc.splitTextToSize(
-        sanitizeText('Disclaimer: This report is generated by MediDiagnose AI and should not be considered a substitute for professional medical advice. Always consult a qualified healthcare provider for diagnosis and treatment.'),
-        maxWidth
-      );
-      checkPageBreak(lineHeight * lines.length);
-      doc.text(lines, margin, yPosition);
-      yPosition += lineHeight * lines.length;
-      lines = doc.splitTextToSize(
-        sanitizeText('Contact: support@medidiagnose.com | Website: www.medidiagnose.com'),
-        maxWidth
-      );
-      checkPageBreak(lineHeight * lines.length);
-      doc.text(lines, margin, yPosition);
+      doc.setFontSize(8);
+      doc.setTextColor('#757575');
+      doc.setFont('helvetica', 'italic');
+      doc.text('Confidential Medical Document - For Patient Use Only', margin, pageHeight - 10);
+      doc.text(`© ${new Date().getFullYear()} MediDiagnose. All rights reserved.`, pageWidth - margin - 50, pageHeight - 10);
 
       // Save PDF
-      doc.save(`MediDiagnose_Medical_Report_${sanitizedPatientName.replace(/\s+/g, '_')}.pdf`);
+      const sanitizedName = patientName.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '_');
+      doc.save(`MediDiagnose_Report_${sanitizedName}_${Date.now()}.pdf`);
 
       setNotification({
         open: true,
@@ -792,8 +720,9 @@ const ImageUpload = ({ onImageChange }) => {
           color="primary"
           onClick={handleSubmit}
           disabled={isUploading}
+          size="large"
         >
-          Submit
+          {isUploading ? 'Analyzing...' : 'Submit for Analysis'}
         </Button>
       </Box>
       
@@ -891,16 +820,59 @@ const ImageUpload = ({ onImageChange }) => {
         onClose={() => setShowDiagnosisDialog(false)}
         maxWidth="md"
         fullWidth
+        scroll="paper"
       >
-        <DialogTitle>Diagnosis Result</DialogTitle>
-        <DialogContent>
+        <DialogTitle sx={{ backgroundColor: '#f5f5f5', borderBottom: '1px solid #e0e0e0' }}>
+          <Box display="flex" alignItems="center">
+            <Typography variant="h6" sx={{ flexGrow: 1 }}>Diagnosis Results</Typography>
+            <Button 
+              variant="contained" 
+              startIcon={<GetAppIcon />}
+              onClick={handleDownloadReport}
+              disabled={!diagnosisResult}
+              size="small"
+            >
+              Download Report
+            </Button>
+          </Box>
+        </DialogTitle>
+        <DialogContent dividers>
           {diagnosisResult ? (
-            <Box>
-              <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
-                {'Analyzed at: ' + new Date(diagnosisResult.analyzedAt).toLocaleString()}
+            <Box sx={{ lineHeight: 1.6 }}>
+              <Typography variant="subtitle1" color="primary" gutterBottom>
+                {diagnosisResult.diagnosis}
               </Typography>
-              <Box sx={{ lineHeight: 1.6 }}>
-                <ReactMarkdown>{diagnosisResult.diagnosis}</ReactMarkdown>
+              
+              <Typography variant="body2" color="textSecondary" gutterBottom>
+                Analyzed at: {new Date(diagnosisResult.analyzedAt || Date.now()).toLocaleString()}
+              </Typography>
+              
+              <Box sx={{ mt: 2 }}>
+                <Typography variant="subtitle2" gutterBottom>Description:</Typography>
+                <Typography variant="body1" paragraph>
+                  {diagnosisResult.description || 'No description available.'}
+                </Typography>
+              </Box>
+              
+              <Box sx={{ mt: 2 }}>
+                <Typography variant="subtitle2" gutterBottom>Identified Symptoms:</Typography>
+                <Typography variant="body1" paragraph>
+                  {diagnosisResult.symptoms || 'No specific symptoms identified.'}
+                </Typography>
+              </Box>
+              
+              <Box sx={{ mt: 2 }}>
+                <Typography variant="subtitle2" gutterBottom>Possible Causes:</Typography>
+                <Typography variant="body1" paragraph>
+                  {diagnosisResult.causes || 'No specific causes identified.'}
+                </Typography>
+              </Box>
+              
+              <Box sx={{ mt: 2 }}>
+                <Typography variant="subtitle2" gutterBottom>Recommendations:</Typography>
+                <Typography variant="body1" paragraph>
+                  {diagnosisResult.recommendations || 'Consult a healthcare professional for personalized advice.'}
+                </Typography>
               </Box>
             </Box>
           ) : (
@@ -910,14 +882,6 @@ const ImageUpload = ({ onImageChange }) => {
           )}
         </DialogContent>
         <DialogActions>
-          <Button 
-            variant="contained" 
-            startIcon={<GetAppIcon />}
-            onClick={handleDownloadReport}
-            disabled={!diagnosisResult}
-          >
-            Download Report
-          </Button>
           <Button onClick={() => setShowDiagnosisDialog(false)}>Close</Button>
         </DialogActions>
       </Dialog>
