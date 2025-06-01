@@ -48,7 +48,8 @@ const ImageUpload = ({ onImageChange }) => {
   const [problemDescription, setProblemDescription] = useState('');
   const [diagnosisResult, setDiagnosisResult] = useState(null);
   const [showDiagnosisDialog, setShowDiagnosisDialog] = useState(false);
-  
+  const [countdown, setCountdown] = useState(30); // 30 seconds countdown
+
   const fileInputRef = useRef(null);
   const dropAreaRef = useRef(null);
 
@@ -72,28 +73,43 @@ const ImageUpload = ({ onImageChange }) => {
   };
 
   useEffect(() => {
+    let timer;
     if (isUploading) {
-      const timer = setInterval(() => {
+      // Progress bar simulation
+      timer = setInterval(() => {
         setUploadProgress((prevProgress) => {
           if (prevProgress >= 100) {
             clearInterval(timer);
-            setIsUploading(false);
-            setNotification({
-              open: true,
-              message: 'Image and symptoms uploaded successfully!',
-              severity: 'success'
-            });
             return 100;
           }
           return prevProgress + 10;
         });
       }, 300);
-      
+
+      // Countdown timer
+      const countdownTimer = setInterval(() => {
+        setCountdown((prevCountdown) => {
+          if (prevCountdown <= 1) {
+            clearInterval(countdownTimer);
+            if (!diagnosisResult) {
+              setNotification({
+                open: true,
+                message: 'Analysis is taking longer than expected. Please wait.',
+                severity: 'warning'
+              });
+            }
+            return 0;
+          }
+          return prevCountdown - 1;
+        });
+      }, 1000);
+
       return () => {
         clearInterval(timer);
+        clearInterval(countdownTimer);
       };
     }
-  }, [isUploading]);
+  }, [isUploading, diagnosisResult]);
 
   useEffect(() => {
     const dropArea = dropAreaRef.current;
@@ -180,6 +196,9 @@ const ImageUpload = ({ onImageChange }) => {
         message: 'Failed to analyze image. Please try again.',
         severity: 'error'
       });
+    } finally {
+      setIsUploading(false);
+      setCountdown(30);
     }
   };
 
@@ -238,7 +257,7 @@ const ImageUpload = ({ onImageChange }) => {
     setProblemDescription('');
     setDiagnosisResult(null);
     setShowDiagnosisDialog(false);
-    
+    setCountdown(30);
     if (onImageChange) {
       onImageChange(null);
     }
@@ -311,6 +330,7 @@ const ImageUpload = ({ onImageChange }) => {
 
     setIsUploading(true);
     setUploadProgress(0);
+    setCountdown(30);
     sendImageToBackend(selectedImage, selectedSymptoms);
   };
 
@@ -325,29 +345,25 @@ const ImageUpload = ({ onImageChange }) => {
     }
 
     try {
-      // Create a new PDF document
       const doc = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
         format: 'a4'
       });
 
-      // Constants for layout
       const pageWidth = doc.internal.pageSize.getWidth();
       const pageHeight = doc.internal.pageSize.getHeight();
       const margin = 15;
       const contentWidth = pageWidth - 2 * margin;
-      const lineHeight = 5;
-      const sectionSpacing = 8;
+      const lineHeight = 6;
+      const sectionSpacing = 10;
       let yPosition = margin;
 
-      // Colors
       const primaryColor = '#1976d2';
       const secondaryColor = '#f5f5f5';
       const textColor = '#212121';
 
-      // Improved page break check with buffer
-      const checkPageBreak = (spaceNeeded, buffer = 10) => {
+      const checkPageBreak = (spaceNeeded, buffer = 15) => {
         if (yPosition + spaceNeeded > pageHeight - margin - buffer) {
           doc.addPage();
           yPosition = margin;
@@ -357,26 +373,21 @@ const ImageUpload = ({ onImageChange }) => {
         return false;
       };
 
-      // Add header with protection against overflow
       const addHeader = () => {
-        // Header background
         doc.setFillColor(secondaryColor);
         doc.rect(0, 0, pageWidth, 25, 'F');
         
-        // Logo placeholder
         doc.setFillColor(primaryColor);
         doc.rect(margin, 5, 30, 15, 'F');
         doc.setTextColor(255, 255, 255);
         doc.setFontSize(8);
         doc.text('MEDIDIAGNOSE', margin + 5, 15);
         
-        // Header text
         doc.setTextColor(textColor);
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(14);
         doc.text('Medical Diagnosis Report', margin + 35, 15);
         
-        // Divider line
         doc.setDrawColor(primaryColor);
         doc.setLineWidth(0.5);
         doc.line(margin, 25, pageWidth - margin, 25);
@@ -384,11 +395,9 @@ const ImageUpload = ({ onImageChange }) => {
         yPosition = 30;
       };
 
-      // Safe text addition with overflow protection
       const addText = (text, x, y, maxWidth, align = 'left') => {
         const lines = doc.splitTextToSize(text, maxWidth);
         lines.forEach((line, i) => {
-          // Check if we need a new page before adding each line
           if (i > 0 && checkPageBreak(lineHeight)) {
             y = yPosition;
           }
@@ -397,56 +406,51 @@ const ImageUpload = ({ onImageChange }) => {
         return lines.length * lineHeight;
       };
 
-      // Add section with title
       const addSection = (title) => {
-        checkPageBreak(15);
+        checkPageBreak(20);
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(12);
         doc.setTextColor(primaryColor);
         doc.text(title, margin, yPosition);
         doc.setDrawColor(primaryColor);
         doc.setLineWidth(0.3);
-        doc.line(margin, yPosition + 1, margin + 20, yPosition + 1);
-        yPosition += 5;
+        doc.line(margin, yPosition + 1, margin + 30, yPosition + 1);
+        yPosition += 8;
       };
 
-      // Add paragraph with proper spacing
       const addParagraph = (text, isBold = false) => {
         doc.setFont('helvetica', isBold ? 'bold' : 'normal');
         doc.setFontSize(10);
         doc.setTextColor(textColor);
         
         const heightUsed = addText(text, margin, yPosition, contentWidth);
-        yPosition += heightUsed + 2;
+        yPosition += heightUsed + 4;
       };
 
-      // Add key-value pair with overflow protection
       const addKeyValue = (key, value) => {
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(10);
         doc.setTextColor(textColor);
         
-        // First write the key
+        checkPageBreak(lineHeight * 2);
         doc.text(key + ':', margin, yPosition);
         
-        // Then the value with proper wrapping
         const valueLines = doc.splitTextToSize(value, contentWidth - 20);
         valueLines.forEach((line, i) => {
           if (i === 0) {
             doc.setFont('helvetica', 'normal');
-            doc.text(line, margin + 15, yPosition);
+            doc.text(line, margin + 25, yPosition);
           } else {
             if (checkPageBreak(lineHeight)) {
               yPosition = margin + 10;
             }
-            doc.text(line, margin, yPosition + lineHeight);
+            doc.text(line, margin + 25, yPosition + lineHeight);
           }
         });
         
-        yPosition += (valueLines.length * lineHeight) + 2;
+        yPosition += (valueLines.length * lineHeight) + 4;
       };
 
-      // Add list items with proper numbering
       const addListItems = (items) => {
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(10);
@@ -465,64 +469,61 @@ const ImageUpload = ({ onImageChange }) => {
             yPosition += lineHeight;
           });
           
-          yPosition += 2;
+          yPosition += 3;
         });
       };
 
-      // Initialize with header
       addHeader();
 
-      // 1. Patient Information
       addSection('Patient Information');
       addKeyValue('Patient Name', sanitizeText(patientName));
       addKeyValue('Report Date', new Date().toLocaleString());
+      yPosition += 5;
 
-      // 2. Diagnosis Summary
       addSection('Diagnosis Summary');
       const diagnosis = sanitizeText(diagnosisResult.diagnosis) || 'Condition requiring further evaluation';
       addParagraph(`Primary Diagnosis: ${diagnosis}`, true);
       addParagraph(sanitizeText(diagnosisResult.description) || 'Based on the provided image and symptoms, this appears to be the most likely condition.');
+      yPosition += 5;
 
-      // 3. Reported Symptoms
       addSection('Reported Symptoms');
-      addKeyValue('Patient Reported', selectedSymptoms.join(', '));
+      addKeyValue('Patient Reported', selectedSymptoms.join(', ') || 'None reported');
       addKeyValue('Identified Symptoms', sanitizeText(diagnosisResult.symptoms) || 'Not specified');
+      yPosition += 5;
 
-      // 4. Patient Description
       if (problemDescription.trim()) {
         addSection('Patient Description');
         addParagraph(sanitizeText(problemDescription));
+        yPosition += 5;
       }
 
-      // 5. Possible Causes
       if (diagnosisResult.causes) {
         addSection('Possible Causes');
         const causes = sanitizeText(diagnosisResult.causes).split('. ')
           .filter(cause => cause.trim().length > 0)
           .map(cause => cause.trim() + (cause.endsWith('.') ? '' : '.'));
         addListItems(causes);
+        yPosition += 5;
       }
 
-      // 6. Recommendations
       addSection('Recommendations');
       const recommendations = sanitizeText(diagnosisResult.recommendations || 'Consult a healthcare professional').split('. ')
         .filter(rec => rec.trim().length > 0)
         .map(rec => rec.trim() + (rec.endsWith('.') ? '' : '.'));
       addListItems(recommendations.length > 0 ? recommendations : ['No specific recommendations available.']);
+      yPosition += 5;
 
-      // 7. Disclaimer
       addSection('Important Notes');
       addParagraph('This report is generated by artificial intelligence and should not be considered a substitute for professional medical advice, diagnosis, or treatment. Always seek the advice of your physician or other qualified health provider with any questions you may have regarding a medical condition.', true);
       addParagraph(`Report generated by MediDiagnose AI - ${new Date().toLocaleString()}`);
 
-      // Footer
       doc.setFontSize(8);
       doc.setTextColor('#757575');
       doc.setFont('helvetica', 'italic');
-      doc.text('Confidential Medical Document - For Patient Use Only', margin, pageHeight - 10);
-      doc.text(`© ${new Date().getFullYear()} MediDiagnose. All rights reserved.`, pageWidth - margin - 50, pageHeight - 10);
+      checkPageBreak(20);
+      doc.text('Confidential Medical Document - For Patient Use Only', margin, pageHeight - 15);
+      doc.text(`© ${new Date().getFullYear()} MediDiagnose. All rights reserved.`, pageWidth - margin - 50, pageHeight - 15);
 
-      // Save PDF
       const sanitizedName = patientName.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '_');
       doc.save(`MediDiagnose_Report_${sanitizedName}_${Date.now()}.pdf`);
 
@@ -674,7 +675,6 @@ const ImageUpload = ({ onImageChange }) => {
         )}
       </Box>
       
-      {/* Problem Description */}
       <Box sx={{ mt: 2, mb: 2, px: 2 }}>
         <Typography variant="subtitle1" gutterBottom>
           Describe Your Problem
@@ -690,7 +690,6 @@ const ImageUpload = ({ onImageChange }) => {
         />
       </Box>
       
-      {/* Symptoms Checkboxes */}
       <Box sx={{ mt: 2, mb: 2, px: 2 }}>
         <Typography variant="subtitle1">Select Symptoms</Typography>
         <FormControl component="fieldset">
@@ -713,7 +712,6 @@ const ImageUpload = ({ onImageChange }) => {
         </FormControl>
       </Box>
 
-      {/* Submit Button */}
       <Box sx={{ mt: 2, mb: 2, px: 2, display: 'flex', justifyContent: 'center' }}>
         <Button
           variant="contained"
@@ -743,19 +741,22 @@ const ImageUpload = ({ onImageChange }) => {
       )}
       
       {isUploading && (
-        <Box className="upload-progress-bar" sx={{ px: 2 }}>
+        <Box className="upload-progress-bar" sx={{ px: 2, textAlign: 'center' }}>
           <LinearProgress 
             variant="determinate" 
             value={uploadProgress} 
             className="progress-bar" 
+            sx={{ mb: 1 }}
           />
           <Typography variant="caption" className="progress-text">
             {'Uploading... ' + uploadProgress + '%'}
           </Typography>
+          <Typography variant="caption" className="countdown-text" sx={{ display: 'block', mt: 1 }}>
+            {'Estimated time remaining: ' + countdown + ' seconds'}
+          </Typography>
         </Box>
       )}
       
-      {/* Image Crop Dialog */}
       <Dialog 
         open={showCropDialog} 
         onClose={() => setShowCropDialog(false)}
@@ -792,7 +793,6 @@ const ImageUpload = ({ onImageChange }) => {
         </DialogActions>
       </Dialog>
       
-      {/* Image Zoom Dialog */}
       <Dialog 
         open={showZoomDialog} 
         onClose={() => setShowZoomDialog(false)}
@@ -814,7 +814,6 @@ const ImageUpload = ({ onImageChange }) => {
         </DialogActions>
       </Dialog>
       
-      {/* Diagnosis Result Dialog */}
       <Dialog
         open={showDiagnosisDialog}
         onClose={() => setShowDiagnosisDialog(false)}
@@ -886,7 +885,6 @@ const ImageUpload = ({ onImageChange }) => {
         </DialogActions>
       </Dialog>
       
-      {/* Notifications */}
       <Snackbar 
         open={notification.open} 
         autoHideDuration={6000} 
